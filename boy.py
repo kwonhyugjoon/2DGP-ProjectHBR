@@ -1,5 +1,5 @@
 from pico2d import load_image, get_time
-from sdl2 import SDL_KEYDOWN, SDLK_SPACE, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT, SDLK_a
+from sdl2 import SDL_KEYDOWN, SDLK_SPACE, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT, SDLK_a, SDLK_c, SDLK_z
 
 from state_machine import StateMachine
 
@@ -8,6 +8,8 @@ def space_down(event):
 
 def time_out(event):
     return event[0] == 'TIME_OUT'
+def time_out_no(event):
+    return event[0] == 'TIME_OUT_NO'
 
 def right_down(event):
     return event[0] == 'INPUT' and event[1].type == SDL_KEYDOWN and event[1].key == SDLK_RIGHT
@@ -18,35 +20,71 @@ def left_down(event):
 def left_up(event):
     return event[0] == 'INPUT' and event[1].type == SDL_KEYUP and event[1].key == SDLK_LEFT
 
-def a_down(event):
-    return event[0] == 'INPUT' and event[1].type == SDL_KEYDOWN and event[1].key == SDLK_a
+def c_down(event):
+    return event[0] == 'INPUT' and event[1].type == SDL_KEYDOWN and event[1].key == SDLK_c
+def z_down(event):
+    return event[0] == 'INPUT' and event[1].type == SDL_KEYDOWN and event[1].key == SDLK_z
 
-class Auto_run:
+class Jump:
 
     def __init__(self, boy):
         self.boy = boy
 
     def enter(self, event):
-        self.boy.dir = self.boy.face_dir
-        self.boy.idle_start_time = get_time()
+        if z_down(event):
+            pass
 
     def exit(self, event):
         pass
 
     def do(self):
         self.boy.frame = (self.boy.frame + 1) % 8
-        self.boy.x += self.boy.dir * 8
-        if self.boy.x < 50 or self.boy.x >750:
-            self.boy.face_dir *= -1
-            self.boy.dir *= -1
-        if get_time() - self.boy.idle_start_time > 5:
-            self.boy.state_machine.handle_state_event(('TIME_OUT', None))
+
+    def draw(self):
+        if self.boy.face_dir == 1: # right
+            self.boy.image.clip_draw(self.boy.frame * 100, 100, 100, 100, self.boy.x, self.boy.y)
+        else: # face_dir == -1: # left
+            self.boy.image.clip_draw(self.boy.frame * 100, 0, 100, 100, self.boy.x, self.boy.y)
+
+
+class Dash:
+    dash_time = -1
+
+    def __init__(self, boy):
+        self.boy = boy
+
+
+    def enter(self, event):
+        if self.dash_time == -1:
+            self.dash_time = get_time()
+
+        if right_down(event) or left_down(event) or right_up(event) or left_up(event):
+            if self.boy.move == False:
+                self.boy.move = True
+            else:
+                self.boy.move = False
+
+    def exit(self, event):
+        pass
+
+    def do(self):
+        self.boy.frame = (self.boy.frame + 1) % 8
+        if get_time() - self.dash_time < 0.1:
+            self.boy.x += self.boy.face_dir * 30
+        else:
+            if self.boy.move == False:
+                self.dash_time = -1
+                self.boy.state_machine.handle_state_event(('TIME_OUT_NO', None))
+            else:
+                self.dash_time = -1
+                self.boy.state_machine.handle_state_event(('TIME_OUT', None))
+
 
     def draw(self):
         if self.boy.face_dir == 1:  # right
-            self.boy.image.clip_draw(self.boy.frame * 100, 100, 100, 100, self.boy.x, self.boy.y + 20, 150, 150)
+            self.boy.image.clip_draw(self.boy.frame * 100, 100, 100, 100, self.boy.x, self.boy.y)
         else:  # face_dir == -1: # left
-            self.boy.image.clip_draw(self.boy.frame * 100, 0, 100, 100, self.boy.x, self.boy.y + 20, 150, 150)
+            self.boy.image.clip_draw(self.boy.frame * 100, 0, 100, 100, self.boy.x, self.boy.y)
 
 class Run:
 
@@ -58,6 +96,7 @@ class Run:
             self.boy.dir = self.boy.face_dir = 1
         elif left_down(event) or right_up(event):
             self.boy.dir = self.boy.face_dir = -1
+        self.boy.move = True
 
     def exit(self, event):
         pass
@@ -72,28 +111,6 @@ class Run:
         else: # face_dir == -1: # left
             self.boy.image.clip_draw(self.boy.frame * 100, 0, 100, 100, self.boy.x, self.boy.y)
 
-
-class Sleep:
-
-    def __init__(self, boy):
-        self.boy = boy
-
-    def enter(self, event):
-        self.boy.dir = 0
-
-    def exit(self, event):
-        pass
-
-    def do(self):
-        self.boy.frame = (self.boy.frame + 1) % 8
-
-    def draw(self):
-        if self.boy.face_dir == 1: # right
-            self.boy.image.clip_composite_draw(self.boy.frame * 100, 300, 100, 100, 3.141592/2, '',self.boy.x - 25, self.boy.y - 25, 100, 100)
-        else: # face_dir == -1: # left
-            self.boy.image.clip_composite_draw(self.boy.frame * 100, 200, 100, 100, -3.141592/2, '',self.boy.x + 25, self.boy.y - 25, 100, 100)
-
-
 class Idle:
 
     def __init__(self, boy):
@@ -101,15 +118,13 @@ class Idle:
 
     def enter(self, event):
         self.boy.dir = 0
-        self.boy.wait_start_time = get_time()
+        self.boy.move = False
 
     def exit(self, event):
         pass
 
     def do(self):
         self.boy.frame = (self.boy.frame + 1) % 8
-        if get_time() - self.boy.wait_start_time > 2:
-            self.boy.state_machine.handle_state_event(('TIME_OUT', None))
 
     def draw(self):
         if self.boy.face_dir == 1: # right
@@ -124,19 +139,20 @@ class Boy:
         self.frame = 0
         self.face_dir = 1
         self.dir = 0
+        self.move = False
         self.image = load_image('animation_sheet.png')
 
         self.IDLE = Idle(self)
-        self.SLEEP = Sleep(self)
         self.RUN = Run(self)
-        self.AUTO = Auto_run(self)
+        self.JUMP = Jump(self)
+        self.DASH = Dash(self)
         self.state_machine = StateMachine(
             self.IDLE,
             {
-                self.SLEEP: {space_down: self.IDLE, right_down: self.RUN, left_down: self.RUN},
-                self.IDLE: {time_out: self.SLEEP, right_up: self.RUN, left_up: self.RUN, right_down: self.RUN, left_down: self.RUN, a_down: self.AUTO},
-                self.RUN: {right_up: self.IDLE, left_up: self.IDLE, right_down: self.IDLE, left_down: self.IDLE},
-                self.AUTO: {time_out: self.IDLE, right_down: self.RUN, left_down: self.RUN}
+                self.IDLE: {right_up: self.RUN, left_up: self.RUN, right_down: self.RUN, left_down: self.RUN, c_down: self.DASH},
+                self.RUN: {right_up: self.IDLE, left_up: self.IDLE, right_down: self.IDLE, left_down: self.IDLE, c_down: self.DASH},
+                self.JUMP: {},
+                self.DASH: {time_out_no: self.IDLE, time_out: self.RUN, right_down: self.DASH, left_down: self.DASH, right_up: self.DASH, left_up: self.DASH}
             }
         )
 

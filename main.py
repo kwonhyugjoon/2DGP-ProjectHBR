@@ -50,7 +50,7 @@ running = True
 
 
 
-open_canvas()
+open_canvas(1600, 800)
 reset_world()
 # game loop
 while running:
