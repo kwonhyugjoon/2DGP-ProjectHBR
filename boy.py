@@ -1,6 +1,8 @@
 from pico2d import load_image, get_time
 from sdl2 import SDL_KEYDOWN, SDLK_SPACE, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT, SDLK_a, SDLK_c, SDLK_z
 
+import game_world
+import game_framework
 from state_machine import StateMachine
 
 def space_down(event):
@@ -24,6 +26,16 @@ def c_down(event):
     return event[0] == 'INPUT' and event[1].type == SDL_KEYDOWN and event[1].key == SDLK_c
 def z_down(event):
     return event[0] == 'INPUT' and event[1].type == SDL_KEYDOWN and event[1].key == SDLK_z
+
+PIXEL_PER_METER = (10.0 / 0.5)  # 10 pixel 1m
+RUN_SPEED_KMPH = 20.0  # Km / Hour
+RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+
+TIME_PER_ACTION = 0.5
+ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+FRAMES_PER_ACTION = 8
 
 class Jump:
 
@@ -68,9 +80,9 @@ class Dash:
         pass
 
     def do(self):
-        self.boy.frame = (self.boy.frame + 1) % 8
+        self.boy.frame = (self.boy.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
         if get_time() - self.dash_time < 0.1:
-            self.boy.x += self.boy.face_dir * 30
+            self.boy.x += self.boy.face_dir * RUN_SPEED_PPS * game_framework.frame_time * 30
         else:
             if self.boy.move == False:
                 self.dash_time = -1
@@ -82,9 +94,9 @@ class Dash:
 
     def draw(self):
         if self.boy.face_dir == 1:  # right
-            self.boy.image.clip_draw(self.boy.frame * 100, 100, 100, 100, self.boy.x, self.boy.y)
+            self.boy.image.clip_draw(int(self.boy.frame) * 100, 100, 100, 100, self.boy.x, self.boy.y)
         else:  # face_dir == -1: # left
-            self.boy.image.clip_draw(self.boy.frame * 100, 0, 100, 100, self.boy.x, self.boy.y)
+            self.boy.image.clip_draw(int(self.boy.frame) * 100, 0, 100, 100, self.boy.x, self.boy.y)
 
 class Run:
 
@@ -102,14 +114,14 @@ class Run:
         pass
 
     def do(self):
-        self.boy.frame = (self.boy.frame + 1) % 8
-        self.boy.x += self.boy.dir * 5
+        self.boy.frame = (self.boy.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
+        self.boy.x += self.boy.dir * RUN_SPEED_PPS * game_framework.frame_time
 
     def draw(self):
         if self.boy.face_dir == 1: # right
-            self.boy.image.clip_draw(self.boy.frame * 100, 100, 100, 100, self.boy.x, self.boy.y)
+            self.boy.image.clip_draw(int(self.boy.frame) * 100, 100, 100, 100, self.boy.x, self.boy.y)
         else: # face_dir == -1: # left
-            self.boy.image.clip_draw(self.boy.frame * 100, 0, 100, 100, self.boy.x, self.boy.y)
+            self.boy.image.clip_draw(int(self.boy.frame) * 100, 0, 100, 100, self.boy.x, self.boy.y)
 
 class Idle:
 
@@ -124,13 +136,13 @@ class Idle:
         pass
 
     def do(self):
-        self.boy.frame = (self.boy.frame + 1) % 8
+        self.boy.frame = (self.boy.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
 
     def draw(self):
         if self.boy.face_dir == 1: # right
-            self.boy.image.clip_draw(self.boy.frame * 100, 300, 100, 100, self.boy.x, self.boy.y)
+            self.boy.image.clip_draw(int(self.boy.frame) * 100, 300, 100, 100, self.boy.x, self.boy.y)
         else: # face_dir == -1: # left
-            self.boy.image.clip_draw(self.boy.frame * 100, 200, 100, 100, self.boy.x, self.boy.y)
+            self.boy.image.clip_draw(int(self.boy.frame) * 100, 200, 100, 100, self.boy.x, self.boy.y)
 
 
 class Boy:
