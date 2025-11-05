@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/hpasoul.py">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/hpasoul.py" />
+              <option name="originalContent" value="from pico2d import *&#10;import math&#10;&#10;class HpASoul:&#10;    bar = [0, 0, 0, 0, 0]&#10;&#10;    def __init__(self, hp, soul):&#10;        self.hp_image = load_image('hp_.png')&#10;        self.soul_image = load_image('soulfull.png')&#10;        self.hp = hp&#10;        self.soul = soul&#10;&#10;    def draw(self):&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[0], 0, 80, 71, math.pi / 2, '', 150, 730, 40, 35)&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[1], 0, 80, 71, math.pi / 2, '', 190, 730, 40, 35)&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[2], 0, 80, 71, math.pi / 2, '', 230, 730, 40, 35)&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[3], 0, 80, 71, math.pi / 2, '', 270, 730, 40, 35)&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[4], 0, 80, 71, math.pi / 2, '', 310, 730, 40, 35)&#10;        self.soul_image.draw(83,689, 108,107)&#10;&#10;    def update(self):&#10;        HpASoul.bar = [233, 233, 233, 233, 233]&#10;        for i in range(self.hp, 5):&#10;            HpASoul.bar[i] = 0" />
+              <option name="updatedContent" value="from pico2d import *&#10;import math&#10;&#10;class HpASoul:&#10;    bar = [0, 0, 0, 0, 0]&#10;&#10;    def __init__(self, hp, soul):&#10;        self.hp_image = load_image('hp_.png')&#10;        self.soul_image = load_image('soulfull.png')&#10;        self.hp = hp&#10;        self.soul = soul&#10;&#10;    def draw(self):&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[0], 0, 80, 71, math.pi / 2, '', 150, 730, 40, 35)&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[1], 0, 80, 71, math.pi / 2, '', 190, 730, 40, 35)&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[2], 0, 80, 71, math.pi / 2, '', 230, 730, 40, 35)&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[3], 0, 80, 71, math.pi / 2, '', 270, 730, 40, 35)&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[4], 0, 80, 71, math.pi / 2, '', 310, 730, 40, 35)&#10;        self.soul_image.draw(83,689, 108,107)&#10;&#10;    def update(self):&#10;        HpASoul.bar = [233, 233, 233, 233, 233]&#10;        for i in range(self.hp, 5):&#10;            HpASoul.bar[i] = 0" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/sprite_debug.py">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/sprite_debug.py" />
+              <option name="updatedContent" value="&quot;&quot;&quot;&#10;스프라이트 시트 좌표 확인 도구 - 디버그 버전&#10;화면에 격자와 함께 스프라이트 시트를 표시합니다.&#10;&quot;&quot;&quot;&#10;&#10;from pico2d import open_canvas, close_canvas, load_image, draw_rectangle, delay, clear_canvas&#10;from pico2d import get_events, SDL_KEYDOWN, SDLK_ESCAPE&#10;&#10;SPRITE_SHEET_PATH = 'HollowKnightSpriteSheet.png'&#10;&#10;SPRITE_COORDINATES = [&#10;    [0, 0, 100, 100],&#10;]&#10;&#10;def main():&#10;    &quot;&quot;&quot;메인 함수&quot;&quot;&quot;&#10;    canvas_width = 1600&#10;    canvas_height = 900&#10;    open_canvas(canvas_width, canvas_height)&#10;&#10;    try:&#10;        sprite_sheet = load_image(SPRITE_SHEET_PATH)&#10;        print(f&quot;✓ 이미지 로드: {sprite_sheet.w} x {sprite_sheet.h}&quot;)&#10;        print(f&quot;✓ 캔버스: {canvas_width} x {canvas_height}&quot;)&#10;    except Exception as e:&#10;        print(f&quot;✗ 로드 실패: {e}&quot;)&#10;        close_canvas()&#10;        return&#10;&#10;    running = True&#10;    while running:&#10;        for event in get_events():&#10;            if event.type == SDL_KEYDOWN:&#10;                if event.key == SDLK_ESCAPE:&#10;                    running = False&#10;&#10;        clear_canvas()&#10;        &#10;        # 방법 1: 왼쪽 하단 기준 (0, 0)에 그리기&#10;        # pico2d는 이미지의 중심을 기준으로 그림&#10;        # 따라서 이미지를 왼쪽 하단에 그리려면:&#10;        # x = 이미지너비 / 2&#10;        # y = 이미지높이 / 2&#10;        sprite_sheet.draw(sprite_sheet.w // 2, sprite_sheet.h // 2)&#10;        &#10;        # 테스트용 사각형 (빨간색, 왼쪽 위 모서리)&#10;        draw_rectangle(0, sprite_sheet.h - 100, 100, sprite_sheet.h, 255, 0, 0)&#10;        &#10;        delay(0.016)&#10;&#10;    close_canvas()&#10;&#10;if __name__ == '__main__':&#10;    main()&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

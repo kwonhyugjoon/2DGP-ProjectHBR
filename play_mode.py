@@ -1,5 +1,7 @@
 from pico2d import *
 
+from hpasoul import HpASoul
+from ui import Ui
 from boy import Boy
 from grass import Grass
 import game_world
@@ -29,9 +31,11 @@ def init():
     grass = Grass()
     game_world.add_object(grass, 0)
 
+    ui = Ui()
+    game_world.add_object(ui, 0)
+
     boy = Boy()
     game_world.add_object(boy, 1)
-
 
 def update():
     game_world.update()
