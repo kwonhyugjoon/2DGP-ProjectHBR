@@ -3,12 +3,12 @@
   <component name="CopilotDiffPersistence">
     <option name="pendingDiffs">
       <map>
-        <entry key="$PROJECT_DIR$/hpasoul.py">
+        <entry key="$PROJECT_DIR$/main.py">
           <value>
             <PendingDiffInfo>
-              <option name="filePath" value="$PROJECT_DIR$/hpasoul.py" />
-              <option name="originalContent" value="from pico2d import *&#10;import math&#10;&#10;class HpASoul:&#10;    bar = [0, 0, 0, 0, 0]&#10;&#10;    def __init__(self, hp, soul):&#10;        self.hp_image = load_image('hp_.png')&#10;        self.soul_image = load_image('soulfull.png')&#10;        self.hp = hp&#10;        self.soul = soul&#10;&#10;    def draw(self):&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[0], 0, 80, 71, math.pi / 2, '', 150, 730, 40, 35)&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[1], 0, 80, 71, math.pi / 2, '', 190, 730, 40, 35)&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[2], 0, 80, 71, math.pi / 2, '', 230, 730, 40, 35)&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[3], 0, 80, 71, math.pi / 2, '', 270, 730, 40, 35)&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[4], 0, 80, 71, math.pi / 2, '', 310, 730, 40, 35)&#10;        self.soul_image.draw(83,689, 108,107)&#10;&#10;    def update(self):&#10;        HpASoul.bar = [233, 233, 233, 233, 233]&#10;        for i in range(self.hp, 5):&#10;            HpASoul.bar[i] = 0" />
-              <option name="updatedContent" value="from pico2d import *&#10;import math&#10;&#10;class HpASoul:&#10;    bar = [0, 0, 0, 0, 0]&#10;&#10;    def __init__(self, hp, soul):&#10;        self.hp_image = load_image('hp_.png')&#10;        self.soul_image = load_image('soulfull.png')&#10;        self.hp = hp&#10;        self.soul = soul&#10;&#10;    def draw(self):&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[0], 0, 80, 71, math.pi / 2, '', 150, 730, 40, 35)&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[1], 0, 80, 71, math.pi / 2, '', 190, 730, 40, 35)&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[2], 0, 80, 71, math.pi / 2, '', 230, 730, 40, 35)&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[3], 0, 80, 71, math.pi / 2, '', 270, 730, 40, 35)&#10;        self.hp_image.clip_composite_draw(HpASoul.bar[4], 0, 80, 71, math.pi / 2, '', 310, 730, 40, 35)&#10;        self.soul_image.draw(83,689, 108,107)&#10;&#10;    def update(self):&#10;        HpASoul.bar = [233, 233, 233, 233, 233]&#10;        for i in range(self.hp, 5):&#10;            HpASoul.bar[i] = 0" />
+              <option name="filePath" value="$PROJECT_DIR$/main.py" />
+              <option name="originalContent" value="from pico2d import open_canvas, close_canvas&#10;import game_framework&#10;&#10;import play_mode as start_mode&#10;&#10;open_canvas(1600, 800)&#10;game_framework.run(start_mode)&#10;close_canvas()&#10;&#10;" />
+              <option name="updatedContent" value="from pico2d import open_canvas, close_canvas&#10;import game_framework&#10;&#10;import play_mode as start_mode&#10;&#10;open_canvas(1600, 800)&#10;game_framework.run(start_mode)&#10;close_canvas()&#10;&#10;" />
             </PendingDiffInfo>
           </value>
         </entry>

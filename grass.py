@@ -11,3 +11,10 @@ class Grass:
 
     def update(self):
         pass
+
+    def get_bb(self):
+        return 0, 0, 1600, 70
+
+    def handle_collision(self, group, other):
+        if group == 'boy:grass':
+            pass

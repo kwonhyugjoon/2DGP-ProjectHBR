@@ -1,6 +1,5 @@
 from pico2d import *
 
-from hpasoul import HpASoul
 from ui import Ui
 from boy import Boy
 from grass import Grass
@@ -30,15 +29,18 @@ def init():
     running = True
     grass = Grass()
     game_world.add_object(grass, 0)
+    game_world.add_collision_pairs('boy:grass', None, grass)
 
     ui = Ui()
     game_world.add_object(ui, 0)
 
     boy = Boy()
     game_world.add_object(boy, 1)
+    game_world.add_collision_pairs('boy:grass', boy, None)
 
 def update():
     game_world.update()
+    game_world.handle_collision()
 
 def draw():
     clear_canvas()

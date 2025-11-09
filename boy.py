@@ -1,5 +1,5 @@
 from pico2d import load_image, get_time
-from sdl2 import SDL_KEYDOWN, SDLK_SPACE, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT, SDLK_a, SDLK_c, SDLK_z, SDLK_x
+from sdl2 import SDL_KEYDOWN, SDLK_SPACE, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT, SDLK_c, SDLK_z, SDLK_x
 
 from hpasoul import HpASoul
 from sword import Sword
@@ -14,6 +14,9 @@ def time_out(event):
     return event[0] == 'TIME_OUT'
 def time_out_no(event):
     return event[0] == 'TIME_OUT_NO'
+
+def collide(event):
+    return event[0] == 'collide'
 
 def right_down(event):
     return event[0] == 'INPUT' and event[1].type == SDL_KEYDOWN and event[1].key == SDLK_RIGHT
@@ -41,21 +44,27 @@ TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 8
 FRAMES_PER_ACTION_DASH = 6
+GRAVITY = 9.8
 
 class Jump:
 
     def __init__(self, boy):
         self.boy = boy
+        self.yv = PIXEL_PER_METER
+        self.frame = 0
 
     def enter(self, event):
-        if z_down(event):
-            pass
+        pass
 
     def exit(self, event):
         pass
 
     def do(self):
-        self.boy.frame = (self.boy.frame + 1) % 8
+        self.frame = (self.frame + FRAMES_PER_ACTION_DASH * 0.15 * game_framework.frame_time) % 5 + 1
+        self.boy.y += self.yv * game_framework.frame_time * PIXEL_PER_METER
+
+        self.yv -= GRAVITY * game_framework.frame_time
+
 
     def draw(self):
         if self.boy.face_dir == 1:
@@ -68,7 +77,6 @@ class Dash:
     frame = 0
     def __init__(self, boy):
         self.boy = boy
-
 
     def enter(self, event):
         if self.dash_time == -1:
@@ -118,16 +126,29 @@ class Run:
         if x_down(event):
             self.boy.swing_sword()
         frame = 0
+        if z_down(event) and self.boy.jump == False:
+            self.boy.jump = True
+            self.boy.yv = PIXEL_PER_METER * 0.6
 
     def do(self):
-        self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
-        self.boy.x += self.boy.dir * RUN_SPEED_PPS * game_framework.frame_time
+        if self.boy.jump == True:
+            self.frame = (self.frame + FRAMES_PER_ACTION * 0.3 * game_framework.frame_time) % 8
+            self.boy.x += self.boy.dir * RUN_SPEED_PPS * game_framework.frame_time
+            self.boy.y += self.boy.yv * game_framework.frame_time * PIXEL_PER_METER
+            self.boy.yv -= GRAVITY * game_framework.frame_time
+        else :
+            self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
+            self.boy.x += self.boy.dir * RUN_SPEED_PPS * game_framework.frame_time
 
     def draw(self):
-        if self.boy.face_dir == 1: # right
+        if self.boy.face_dir == 1 and self.boy.jump == False:
             self.boy.image.clip_draw(int(self.frame) * 128, 1920, 128, 128, self.boy.x, self.boy.y)
-        else: # face_dir == -1: # left
+        elif self.boy.face_dir == -1 and self.boy.jump == False:
             self.boy.image.clip_composite_draw(int(self.frame) * 128, 1920, 128, 128, 0, 'h', self.boy.x, self.boy.y, 128, 128)
+        elif self.boy.face_dir == 1 and self.boy.jump == True:
+            self.boy.image.clip_draw(int(self.frame) * 128, 768, 128, 128, self.boy.x, self.boy.y)
+        else:
+            self.boy.image.clip_composite_draw(int(self.frame) * 128, 768, 128, 128, 0, 'h', self.boy.x, self.boy.y, 128, 128)
 
 class Idle:
 
@@ -141,22 +162,35 @@ class Idle:
     def exit(self, event):
         if x_down(event):
             self.boy.swing_sword()
+        if z_down(event) and self.boy.jump == False:
+            self.boy.jump = True
+            self.boy.yv = PIXEL_PER_METER * 0.6
 
     def do(self):
-        if self.boy.frame == 0:
+        if self.boy.jump == True:
+            self.boy.frame = (self.boy.frame + FRAMES_PER_ACTION * 0.3 * game_framework.frame_time) % 8
+            self.boy.y += self.boy.yv * game_framework.frame_time * PIXEL_PER_METER
+            self.boy.yv -= GRAVITY * game_framework.frame_time
+        else:
             self.boy.frame = (self.boy.frame + FRAMES_PER_ACTION * TIME_PER_ACTION * game_framework.frame_time) % 8
-            
+
     def draw(self):
-        if self.boy.face_dir == 1: # right
+        if self.boy.face_dir == 1 and self.boy.jump == False:
             self.boy.image.clip_draw(int(self.boy.frame) * 128, 128, 128, 128, self.boy.x, self.boy.y)
-        else: # face_dir == -1: # left
+        elif self.boy.face_dir == -1 and self.boy.jump == False:
             self.boy.image.clip_composite_draw(int(self.boy.frame) * 128, 128, 128, 128, 0, 'h', self.boy.x, self.boy.y, 128, 128)
+        elif self.boy.face_dir == 1 and self.boy.jump == True:
+            self.boy.image.clip_draw(int(self.boy.frame) * 128, 768, 128, 128, self.boy.x, self.boy.y)
+        else:
+            self.boy.image.clip_composite_draw(int(self.boy.frame) * 128, 768, 128, 128, 0, 'h', self.boy.x, self.boy.y, 128, 128)
 
 
 class Boy:
     def __init__(self):
         self.x, self.y = 400, 110
         self.frame = 0
+        self.jump = False
+        self.yv = 0
         self.face_dir = 1
         self.dir = 0
         self.hp = 5
@@ -172,9 +206,8 @@ class Boy:
         self.state_machine = StateMachine(
             self.IDLE,
             {
-                self.IDLE: {right_up: self.RUN, left_up: self.RUN, right_down: self.RUN, left_down: self.RUN, c_down: self.DASH, x_down: self.IDLE},
-                self.RUN: {right_up: self.IDLE, left_up: self.IDLE, right_down: self.IDLE, left_down: self.IDLE, c_down: self.DASH, x_down: self.RUN},
-                self.JUMP: {},
+                self.IDLE: {right_up: self.RUN, left_up: self.RUN, right_down: self.RUN, left_down: self.RUN, c_down: self.DASH, x_down: self.IDLE, z_down: self.IDLE},
+                self.RUN: {right_up: self.IDLE, left_up: self.IDLE, right_down: self.IDLE, left_down: self.IDLE, c_down: self.DASH, x_down: self.RUN, z_down: self.RUN},
                 self.DASH: {time_out_no: self.IDLE, time_out: self.RUN, right_down: self.DASH, left_down: self.DASH, right_up: self.DASH, left_up: self.DASH},
             }
         )
@@ -195,3 +228,11 @@ class Boy:
     def see_state(self):
         hpasoul = HpASoul(self.hp, self.soul)
         game_world.add_object(hpasoul)
+
+    def get_bb(self):
+        return self.x - 64, self.y - 32, self.x + 64, self.y + 32
+
+    def handle_collision(self, group, other):
+        if group == 'boy:grass':
+            self.jump = False
+            self.yv = 0

@@ -28,3 +28,9 @@ class Sword:
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 2
         if get_time() - self.start_time > 0.1:
             game_world.remove_object(self)
+
+    def get_bb(self):
+        if self.face_dir == 1:
+            return self.x - 102, self.y - 25, self.x + 2, self.y + 25
+        else:
+            return self.x - 2, self.y - 25, self.x + 102, self.y + 25
